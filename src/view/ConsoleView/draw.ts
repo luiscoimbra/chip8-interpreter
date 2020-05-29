@@ -1,4 +1,4 @@
-export default (UIMap:Array<Array<number>>) => {
+export default (UIMap:Array<Array<number>>): void => {
 
     console.log(" ---------")
     UIMap.map((y: Array<number>) => {

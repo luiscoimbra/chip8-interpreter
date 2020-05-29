@@ -1,4 +1,4 @@
-import { Address } from "../state";
+import { Address } from "../../store";
 import { Drawable } from "../../view";
 
 export type Instruction = {
@@ -7,7 +7,7 @@ export type Instruction = {
 }
 
 export type InterpreterDependencies = {
-  ROM: Buffer,
+  ROM: Array<string>,
   View: Drawable
 }
 

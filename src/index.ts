@@ -3,7 +3,7 @@ import loadRomFromMemory from './infra/ROMLoader/loadRomFromMemory'
 import { InterpreterDependencies } from './app/interpreter'
 import { ConsoleView } from './view/ConsoleView'
 
-const ROM:Buffer = loadRomFromMemory("MAZE")
+const ROM:Array<string> = loadRomFromMemory("MAZE")
 
 const dependencies: InterpreterDependencies = {
   ROM,

@@ -1,7 +1,7 @@
-import { Chip8State } from "."
-import { MEMORY_OFFSET } from "../constants/Processor"
+import { Chip8CPU } from "."
+import { MEMORY_OFFSET } from "../app/constants/Processor"
 
-export default ():Chip8State => (
+export default ():Chip8CPU => (
   {
     memory: new Uint8Array(4096),
     V: new Uint8Array(16),

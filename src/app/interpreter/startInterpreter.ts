@@ -1,15 +1,20 @@
-import { Chip8State } from "../state"
-import initState from "../state/initState"
-import insertROM from "../state/insertROM"
-import { Drawable } from "../../view"
+import { Chip8CPU } from "../../store"
+import initState from "../../store/initState"
+import insertROM from "../../store/insertROM"
 import { InterpreterDependencies } from "."
+import { createStore, Store } from 'redux'
 
 export default ({
   ROM,
   View
 }: InterpreterDependencies): void => {
 
-  let state:Chip8State = initState()
+  let store:Store = createStore((store) => store, initState()) 
+  // store.dispatch()
+
+  // console.log(store.getState())
+
+  let state:Chip8CPU = initState()
   state = insertROM(ROM, state)
 
   const step: () => void = (): void => {
