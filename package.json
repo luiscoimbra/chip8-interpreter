@@ -26,7 +26,8 @@
   },
   "scripts": {
     "start": "webpack --watch",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "test-coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",

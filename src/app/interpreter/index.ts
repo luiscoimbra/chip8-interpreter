@@ -1,4 +1,4 @@
-import { Address } from "../../store";
+// import { Address } from "../../store";
 import { Drawable } from "../../view";
 
 export type Instruction = {
@@ -11,8 +11,8 @@ export type InterpreterDependencies = {
   View: Drawable
 }
 
-export interface Interpreter {
-  fetch(): Address,
-  decode(address: Address): void,
-  execute(instruction: Instruction): void
-}
+// export interface Interpreter {
+//   fetch(): Address,
+//   decode(address: Address): void,
+//   execute(instruction: Instruction): void
+// }

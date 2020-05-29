@@ -35,7 +35,7 @@ export const LOAD_ROM = 'LOAD_ROM'
 
 interface LoadRomAction {
   type: typeof LOAD_ROM,
-  rom: Array<number>
+  rom: Array<string>
 }
 
 export type CPUActionTypes = LoadRomAction
