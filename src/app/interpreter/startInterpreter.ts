@@ -1,17 +1,28 @@
 import { InterpreterDependencies } from "."
-import { createStore } from 'redux'
-import { CPUReducer } from "../../store/CPU/reducers"
+import getCPU from "../CPU/getCPU"
+import configureStore from "../../store"
 import { loadRom } from "../../store/CPU/actions"
+import { Opcode } from "../../store/CPU/types"
 
 export default ({
   ROM,
   View
 }: InterpreterDependencies): void => {
 
-  const store = createStore(CPUReducer) 
+  const store = configureStore()
   store.dispatch(loadRom(ROM))
- 
+  
+  const { Fetch } = getCPU(store)
 
+  const run = () => {
+    let { PC } = store.getState()   
+    let opcode:Opcode = Fetch()
+    // Execute()
+    
+  }
+
+  run()
+  // step(store);
 
   // const step: () => void = (): void => {
 

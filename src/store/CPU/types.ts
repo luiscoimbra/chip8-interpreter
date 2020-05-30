@@ -1,4 +1,5 @@
 export type Address = number
+export type Opcode = string
 
 export interface CPU {
   // Chip8 is capable of access up to 4kb of memory
