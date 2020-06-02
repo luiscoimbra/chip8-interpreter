@@ -2,6 +2,10 @@ import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC } from "./types";
 import { MEMORY_OFFSET } from "../../app/constants/Processor";
 import hexToDec from "../../app/util/hexToDec";
 
+// Fixed viewport size 64x32 with zero values
+export const cleanUI = ():Array<Array<number>> => 
+  Array(64).fill(null).map(() => Array(32).fill(null).map(a => 0))
+
 export const initialState = ():CPU => ({
   memory: new Uint8Array(4096),
   V: new Uint8Array(16),
@@ -11,8 +15,7 @@ export const initialState = ():CPU => ({
   PC: MEMORY_OFFSET,
   SP: 0,
   stack: new Uint16Array(16),
-  //Array(hashTableSize).fill(null).map(() => new LinkedList());
-  UI: Array(64).fill(null).map(() => Array(32).fill(null).map(a => 0))
+  UI: cleanUI()
 })
 
 export function CPUReducer(
@@ -46,15 +49,20 @@ export function CPUReducer(
 
       switch(action.command.name) {
         case 'CLS':
-          const cleanUI = Array(64).fill(null).map(() => Array(32).fill(null).map(a => 0))
           return {
             ...state,
-            UI: cleanUI
+            UI: cleanUI()
           }
 
-        // 6xkk - LD Vx, byte
-        // Set Vx = kk.
-        // The interpreter puts the value kk into register Vx.
+        case 'RET':
+          const PC = state.stack[15]
+          const SP = state.SP - 1
+          return {
+            ...state,
+            PC,
+            SP
+          }
+
         case 'LD':
           const x = 1
           const kk = 2

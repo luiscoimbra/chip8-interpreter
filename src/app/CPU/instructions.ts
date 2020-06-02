@@ -1,9 +1,9 @@
 import { Instruction } from "./types"
 
 // Clear the display
-export const CLS:Instruction = {
+const CLS:Instruction = {
   name: 'CLS',
-  mask: 0x00f0,
+  mask: 0xffff,
   pattern: 0x00E0,
   opcode: 0
 }
@@ -11,7 +11,7 @@ export const CLS:Instruction = {
 // Return from a subroutine
 const RET:Instruction = {
   name: 'RET',
-  mask: 0x00ff,
+  mask: 0xffff,
   pattern: 0x00EE,
   opcode: 0
 }
@@ -35,13 +35,7 @@ const LD:Instruction = {
   opcode: 0
 }
 
-// Key is the pattern
-const instructions = {
-  [CLS.pattern]: CLS,
-  [LD.pattern]: LD
-}
-
 export default [
-  CLS, LD 
+  CLS, RET, LD 
 ]
 

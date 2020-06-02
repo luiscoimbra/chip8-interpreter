@@ -5,6 +5,7 @@ import { loadRom, incrementPC } from "../../store/CPU/actions"
 import { Opcode, INCREMENT_PC } from "../../store/CPU/types"
 import { Instruction } from "../CPU/types"
 import DecToHex from "../util/decToHex"
+import getInstruction from "../CPU/getInstruction"
 
 export default ({
   ROM,
@@ -18,15 +19,14 @@ export default ({
 
   let count = 5
 
+
   const run = () => {
     let { PC } = store.getState()   
     let opcode:Opcode = Fetch()
-    console.log(DecToHex(opcode))
     let instruction:Instruction = Decode(opcode)
     Execute(instruction)
     store.dispatch(incrementPC())
 
-    console.log(store.getState().PC)
   }
 
   while(count > 0) {

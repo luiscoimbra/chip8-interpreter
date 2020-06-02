@@ -1,44 +1,8 @@
-// 
-// 00EE - RET
-// 0nnn - SYS addr
-// 1nnn - JP addr
-// 2nnn - CALL addr
-// 3xkk - SE Vx, byte
-// 4xkk - SNE Vx, byte
-// 5xy0 - SE Vx, Vy
-// 6xkk - LD Vx, byte
-// 7xkk - ADD Vx, byte
-// 8xy0 - LD Vx, Vy
-// 8xy1 - OR Vx, Vy
-// 8xy2 - AND Vx, Vy
-// 8xy3 - XOR Vx, Vy
-// 8xy4 - ADD Vx, Vy
-// 8xy5 - SUB Vx, Vy
-// 8xy6 - SHR Vx {, Vy}
-// 8xy7 - SUBN Vx, Vy
-// 8xyE - SHL Vx {, Vy}
-// 9xy0 - SNE Vx, Vy
-// Annn - LD I, addr
-// Bnnn - JP V0, addr
-// Cxkk - RND Vx, byte
-// Dxyn - DRW Vx, Vy, nibble
-// Ex9E - SKP Vx
-// ExA1 - SKNP Vx
-// Fx07 - LD Vx, DT
-// Fx0A - LD Vx, K
-// Fx15 - LD DT, Vx
-// Fx18 - LD ST, Vx
-// Fx1E - ADD I, Vx
-// Fx29 - LD F, Vx
-// Fx33 - LD B, Vx
-// Fx55 - LD [I], Vx
-// Fx65 - LD Vx, [I]
-
 import { CPUReducer, initialState } from "../reducers"
 import { createStore } from "redux"
 import { executeCommand } from "../actions"
 import { Instruction } from "../../../app/CPU/types"
-import { CLS } from "../../../app/CPU/instructions"
+import getInstruction from "../../../app/CPU/getInstruction"
 
 test('00E0 - CLS - clear the display', () => {
   const testState = initialState()
@@ -46,11 +10,96 @@ test('00E0 - CLS - clear the display', () => {
   testState.UI[1][1] = 1
   testState.UI[2][2] = 1
   testState.UI[60][31] = 1
+  const opcode = 0x00E0
   const store = createStore(CPUReducer, testState)
-  const cls: Instruction = CLS
-  store.dispatch(executeCommand(cls))
-
+  const CLS: Instruction = getInstruction(opcode)
+  store.dispatch(executeCommand(CLS))
+  
+  expect(CLS.name).toBe('CLS')
+  expect(CLS.opcode).toBe(opcode)
   expect(store.getState().UI).toEqual(initialState().UI)
+})
+
+test('00EE - RET - Return from a subroutine.', () => {
+  const testState = initialState()
+  testState.stack[15] = 0x208
+  testState.PC = 0x300
+  testState.SP = 10
+  
+  const store = createStore(CPUReducer, testState)
+  
+  const opcode = 0x00EE
+  const RET: Instruction = getInstruction(opcode)
+  
+  expect(RET.name).toBe('RET')
+  expect(RET.opcode).toBe(opcode)
+
+  store.dispatch(executeCommand(RET))
+
+  expect(store.getState().PC).toBe(0x208)
+  expect(store.getState().SP).toBe(9)
+})
+
+test('1nnn - JP addr - Jump to location nnn.', () => {
+  const store = createStore(CPUReducer)
+  
+  const opcode = 0x13BA
+  const JP: Instruction = getInstruction(opcode)
+
+  store.dispatch(executeCommand(JP))
+
+  expect(JP.name).toBe('JP')
+  expect(JP.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x03BA)
+})
+
+test('2nnn - CALL addr - Call subroutine at nnn.', () => {
+  const store = createStore(CPUReducer)
+
+  const opcode = 0x2AF1
+  const CALL:Instruction = getInstruction(opcode)
+
+  store.dispatch(executeCommand(CALL))
+
+  expect(CALL.name).toBe('CALL')
+  expect(CALL.opcode).toBe(opcode)
+  expect(store.getState().SP).toBe(1)
+  expect(store.getState().stack[15]).toBe(0x200)
+  expect(store.getState().PC).toBe(0x0AF1)
+})
+
+test('3xkk - SE Vx, byte [TRUE] - Skip next instruction if Vx = kk.', () => {
+  const x = 4
+  const kk = 0x0022
+  const testState = initialState()
+  testState.V[x] = kk
+  
+  const opcode = 0x3422
+  const SE_VX_BYTE: Instruction = getInstruction(opcode)
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SE_VX_BYTE))
+
+  expect(SE_VX_BYTE.name).toBe('SE_VX_BYTE')
+  expect(SE_VX_BYTE.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x202)
+})
+
+test('3xkk - SE Vx, byte [FALSE] - Skip next instruction if Vx = kk.', () => {
+  const x = 4
+  const kk = 0x0011
+  const testState = initialState()
+  testState.V[x] = kk
+  
+  const opcode = 0x3422
+  const SE_VX_BYTE: Instruction = getInstruction(opcode)
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SE_VX_BYTE))
+
+  expect(SE_VX_BYTE.name).toBe('SE_VX_BYTE')
+  expect(SE_VX_BYTE.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x200)
 })
 
 
