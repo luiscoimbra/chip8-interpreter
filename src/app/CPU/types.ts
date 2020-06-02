@@ -1,6 +1,9 @@
 import { Opcode } from "../../store/CPU/types";
 
 export interface Instruction {
-  type: string,
-  opcode: Opcode
+  name: string,
+  mask: number,
+  pattern: Opcode,
+  opcode: Opcode,
 }
+

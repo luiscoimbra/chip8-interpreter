@@ -1,5 +1,7 @@
+import { Instruction } from "../../app/CPU/types"
+
 export type Address = number
-export type Opcode = string
+export type Opcode = number
 
 export interface CPU {
   // Chip8 is capable of access up to 4kb of memory
@@ -33,10 +35,21 @@ export interface CPU {
 }
 
 export const LOAD_ROM = 'LOAD_ROM'
+export const COMMAND = 'COMMAND'
+export const INCREMENT_PC = 'INCREMENT_PC'
 
 interface LoadRomAction {
   type: typeof LOAD_ROM,
   rom: Array<string>
 }
 
-export type CPUActionTypes = LoadRomAction
+interface CommandAction {
+  type: typeof COMMAND,
+  command: Instruction
+}
+
+interface IncrementPCAction {
+  type: typeof INCREMENT_PC
+}
+
+export type CPUActionTypes = LoadRomAction | CommandAction | IncrementPCAction

@@ -12,7 +12,7 @@ test('init the state with all the default keys and values', () => {
     PC: 0x200,
     SP: 0,
     stack: new Uint16Array(16),
-    UI: Array(64).fill(Array(32))
+    UI: Array(64).fill(Array(32).fill(0))
   }
 
   const store = createStore(CPUReducer)

@@ -1,8 +1,10 @@
 import { InterpreterDependencies } from "."
 import getCPU from "../CPU/getCPU"
 import configureStore from "../../store"
-import { loadRom } from "../../store/CPU/actions"
-import { Opcode } from "../../store/CPU/types"
+import { loadRom, incrementPC } from "../../store/CPU/actions"
+import { Opcode, INCREMENT_PC } from "../../store/CPU/types"
+import { Instruction } from "../CPU/types"
+import DecToHex from "../util/decToHex"
 
 export default ({
   ROM,
@@ -12,16 +14,26 @@ export default ({
   const store = configureStore()
   store.dispatch(loadRom(ROM))
   
-  const { Fetch } = getCPU(store)
+  const { Fetch, Decode, Execute } = getCPU(store)
+
+  let count = 5
 
   const run = () => {
     let { PC } = store.getState()   
     let opcode:Opcode = Fetch()
-    // Execute()
-    
+    console.log(DecToHex(opcode))
+    let instruction:Instruction = Decode(opcode)
+    Execute(instruction)
+    store.dispatch(incrementPC())
+
+    console.log(store.getState().PC)
   }
 
-  run()
+  while(count > 0) {
+    run()
+    count--
+  }
+  
   // step(store);
 
   // const step: () => void = (): void => {
@@ -33,19 +45,4 @@ export default ({
   // step()
 
 
-  // new Interpreter(state)
-  // interpreter.start()
-
-  // Interpreter
-  // (state) {
-    // step() {
-    //   cpu.fetch()
-    //   cpu.decode()
-    //   cpu.execute()
-
-        // step()
-
-        // Draw()
-    // }
-  // }
 }

@@ -1,33 +1,47 @@
 import { Instruction } from "./types"
 
 // Clear the display
-const CLS:Instruction = {
-  type: 'CLS',
-  opcode: "0x00E0"
+export const CLS:Instruction = {
+  name: 'CLS',
+  mask: 0x00f0,
+  pattern: 0x00E0,
+  opcode: 0
 }
 
 // Return from a subroutine
 const RET:Instruction = {
-  type: 'RET',
-  opcode: "0x00EE"
+  name: 'RET',
+  mask: 0x00ff,
+  pattern: 0x00EE,
+  opcode: 0
 }
 
 // Set Vx = Vx + Vy, set VF = carry.
+// 0x8xy4
 const ADD:Instruction = {
-  type: 'ADD',
-  opcode: "0x8xy4"
+  name: 'ADD_VX_VY',
+  mask: 0xf00f,
+  pattern: 0x8004,
+  opcode: 0
 }
 
 // 6xkk - LD Vx, byte
 // Set Vx = kk.
 // The interpreter puts the value kk into register Vx.
-const LD = {
-  type: 'LD',
-  opcode: "0x6xkk"
+const LD:Instruction = {
+  name: 'LD_VX_BYTE',
+  mask: 0xf000,
+  pattern: 0x6000,
+  opcode: 0
 }
 
-export {
-  CLS, RET, LD, ADD
+// Key is the pattern
+const instructions = {
+  [CLS.pattern]: CLS,
+  [LD.pattern]: LD
 }
 
+export default [
+  CLS, LD 
+]
 
