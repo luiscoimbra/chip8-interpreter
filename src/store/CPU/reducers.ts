@@ -1,6 +1,7 @@
 import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC } from "./types";
 import { MEMORY_OFFSET } from "../../app/constants/Processor";
 import hexToDec from "../../app/util/hexToDec";
+import getVars from "../../app/CPU/getVars";
 
 // Fixed viewport size 64x32 with zero values
 export const cleanUI = ():Array<Array<number>> => 
@@ -55,23 +56,139 @@ export function CPUReducer(
           }
 
         case 'RET':
-          const PC = state.stack[15]
-          const SP = state.SP - 1
           return {
             ...state,
-            PC,
-            SP
+            PC: state.stack[15],
+            SP: state.SP - 1
+          }
+        
+        case 'JP':
+          return {
+            ...state,
+            PC: action.command.opcode & 0x0fff
           }
 
-        case 'LD':
-          const x = 1
-          const kk = 2
+        case 'CALL': {
+          const stack = new Uint16Array(state.stack)
+          stack[15] = state.PC
+          return {
+            ...state,
+            SP: state.SP + 1,
+            stack,
+            PC: action.command.opcode & 0x0fff
+          }
+        }
+          
+        case 'SE_VX_BYTE': {
+          const { x, kk } = getVars(action.command)
+          const PC = (state.V[x] === kk) ? state.PC + 2 : state.PC
+          return {
+            ...state,
+            PC
+          }
+        }
+
+        case 'SNE': {
+          const { x, kk } = getVars(action.command)
+          const PC = (state.V[x] != kk) ? state.PC + 2 : state.PC
+          return {
+            ...state,
+            PC
+          }
+        }
+
+        case 'SE_VX_VY': {
+          const { x, y } = getVars(action.command)
+          const PC = (state.V[x] === state.V[y]) ? state.PC + 2 : state.PC 
+          return {
+            ...state,
+            PC
+          }
+        } 
+      
+        case 'LD_VX_BYTE': {
+          const { x, kk } = getVars(action.command)
           const V = new Uint8Array(state.V)
           V[x] = kk
           return {
             ...state,
             V
           }
+        }
+
+        case 'ADD_VX_BYTE': {
+          const { x, kk } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[x] = V[x] + kk
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'LD_VX_VY': {
+          const { x, y } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[x] = V[y]
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'OR': {
+          const { x, y } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[x] = V[x] | V[y]
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'AND': {
+          const { x, y } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[x] = V[x] & V[y]
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'XOR': {
+          const { x, y } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[x] = V[x] ^ V[y]
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'ADD_VX_VY': {
+          const { x, y } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          const sum = V[x] + V[y]
+          V[x] = sum % 0x100
+          V[0xf] = (sum > 0xff) ? 1 : 0
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'SUB': {
+          const { x, y } = getVars(action.command)
+          const V  = new Uint8Array(state.V)
+          const sub = V[x] - V[y]
+          V[x] = (sub >= 0) ? sub : 0
+          V[0xf] = (sub >= 0) ? 1 : 0
+          return {
+            ...state,
+            V
+          }
+        }
 
         default:
           return state

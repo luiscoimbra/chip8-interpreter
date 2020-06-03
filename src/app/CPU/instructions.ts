@@ -16,26 +16,112 @@ const RET:Instruction = {
   opcode: 0
 }
 
-// Set Vx = Vx + Vy, set VF = carry.
-// 0x8xy4
-const ADD:Instruction = {
-  name: 'ADD_VX_VY',
-  mask: 0xf00f,
-  pattern: 0x8004,
+// Jump to location nnn.
+const JP: Instruction = {
+  name: 'JP',
+  mask: 0xf000,
+  pattern: 0x1000,
   opcode: 0
 }
 
-// 6xkk - LD Vx, byte
+// Call subroutine at nnn
+const CALL:Instruction = {
+  name: 'CALL',
+  mask: 0xf000,
+  pattern: 0x2000,
+  opcode: 0
+}
+
+// Skip next instruction if Vx = kk.
+const SE_VX_BYTE = {
+  name: 'SE_VX_BYTE',
+  mask: 0xf000,
+  pattern: 0x3000,
+  opcode: 0
+}
+
+// Skip next instruction if Vx != kk.
+const SNE = {
+  name: 'SNE',
+  mask: 0xf000,
+  pattern: 0x4000,
+  opcode: 0
+}
+
+// Skip next instruction if Vx = Vy.
+const SE_VX_VY:Instruction = {
+  name: 'SE_VX_VY',
+  mask: 0xf00f,
+  pattern: 0x5000,
+  opcode: 0
+}
+
 // Set Vx = kk.
-// The interpreter puts the value kk into register Vx.
-const LD:Instruction = {
+const LD_VX_BYTE:Instruction = {
   name: 'LD_VX_BYTE',
   mask: 0xf000,
   pattern: 0x6000,
   opcode: 0
 }
 
+// Set Vx = Vx + kk.
+const ADD_VX_BYTE: Instruction = {
+  name: 'ADD_VX_BYTE',
+  mask: 0xf000,
+  pattern: 0x7000,
+  opcode: 0
+}
+
+// Set Vx = Vy.
+const LD_VX_VY: Instruction = {
+  name: 'LD_VX_VY',
+  mask: 0xf00f,
+  pattern: 0x8000,
+  opcode: 0
+}
+
+// Set Vx = Vx OR Vy.
+const OR: Instruction = {
+  name: 'OR',
+  mask: 0xf00f,
+  pattern: 0x8001,
+  opcode: 0
+}
+
+// Set Vx = Vx AND Vy. 
+const AND: Instruction = {
+  name: 'AND',
+  mask: 0xf00f,
+  pattern: 0x8002, 
+  opcode: 0
+}
+
+// Set Vx = Vx XOR Vy
+const XOR: Instruction = {
+  name: 'XOR',
+  mask: 0xf00f,
+  pattern: 0x8003, 
+  opcode: 0
+}
+
+// Set Vx = Vx + Vy, set VF = carry.
+const ADD_VX_VY: Instruction = {
+  name: 'ADD_VX_VY',
+  mask: 0xf00f,
+  pattern: 0x8004,
+  opcode: 0
+}
+
+// Set Vx = Vx - Vy, set VF = NOT borrow.
+const SUB:Instruction = {
+  name: 'SUB',
+  mask: 0xf00f,
+  pattern: 0x8005,
+  opcode: 0
+}
+
 export default [
-  CLS, RET, LD 
+  CLS, RET, JP, CALL, SE_VX_BYTE, SNE, SE_VX_VY, LD_VX_BYTE, 
+  ADD_VX_BYTE, LD_VX_VY, OR, AND, XOR, ADD_VX_VY, SUB
 ]
 
