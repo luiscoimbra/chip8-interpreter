@@ -5,14 +5,16 @@ import { Instruction } from "../../../app/CPU/types"
 import getInstruction from "../../../app/CPU/getInstruction"
 
 test('00E0 - CLS - clear the display', () => {
+  const opcode = 0x00E0
+  const CLS: Instruction = getInstruction(opcode)
   const testState = initialState()
   testState.UI[0][0] = 1
   testState.UI[1][1] = 1
   testState.UI[2][2] = 1
   testState.UI[60][31] = 1
-  const opcode = 0x00E0
+  
   const store = createStore(CPUReducer, testState)
-  const CLS: Instruction = getInstruction(opcode)
+  
   store.dispatch(executeCommand(CLS))
   
   expect(CLS.name).toBe('CLS')
@@ -21,16 +23,15 @@ test('00E0 - CLS - clear the display', () => {
 })
 
 test('00EE - RET - Return from a subroutine.', () => {
+  const opcode = 0x00EE
+  const RET: Instruction = getInstruction(opcode)
   const testState = initialState()
   testState.stack[15] = 0x208
   testState.PC = 0x300
   testState.SP = 10
   
   const store = createStore(CPUReducer, testState)
-  
-  const opcode = 0x00EE
-  const RET: Instruction = getInstruction(opcode)
-  
+    
   expect(RET.name).toBe('RET')
   expect(RET.opcode).toBe(opcode)
 
@@ -41,10 +42,9 @@ test('00EE - RET - Return from a subroutine.', () => {
 })
 
 test('1nnn - JP addr - Jump to location nnn.', () => {
-  const store = createStore(CPUReducer)
-  
   const opcode = 0x13BA
   const JP: Instruction = getInstruction(opcode)
+  const store = createStore(CPUReducer)
 
   store.dispatch(executeCommand(JP))
 
@@ -54,10 +54,9 @@ test('1nnn - JP addr - Jump to location nnn.', () => {
 })
 
 test('2nnn - CALL addr - Call subroutine at nnn.', () => {
-  const store = createStore(CPUReducer)
-
   const opcode = 0x2AF1
   const CALL:Instruction = getInstruction(opcode)
+  const store = createStore(CPUReducer)
 
   store.dispatch(executeCommand(CALL))
 
@@ -69,13 +68,12 @@ test('2nnn - CALL addr - Call subroutine at nnn.', () => {
 })
 
 test('3xkk - SE Vx, byte [TRUE] - Skip next instruction if Vx = kk.', () => {
+  const opcode = 0x3422
+  const SE_VX_BYTE: Instruction = getInstruction(opcode)
   const x = 4
   const kk = 0x0022
   const testState = initialState()
   testState.V[x] = kk
-  
-  const opcode = 0x3422
-  const SE_VX_BYTE: Instruction = getInstruction(opcode)
 
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SE_VX_BYTE))
@@ -86,13 +84,12 @@ test('3xkk - SE Vx, byte [TRUE] - Skip next instruction if Vx = kk.', () => {
 })
 
 test('3xkk - SE Vx, byte [FALSE] - Skip next instruction if Vx = kk.', () => {
+  const opcode = 0x3422
+  const SE_VX_BYTE: Instruction = getInstruction(opcode)
   const x = 4
   const kk = 0x0011
   const testState = initialState()
   testState.V[x] = kk
-  
-  const opcode = 0x3422
-  const SE_VX_BYTE: Instruction = getInstruction(opcode)
 
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SE_VX_BYTE))
@@ -103,13 +100,12 @@ test('3xkk - SE Vx, byte [FALSE] - Skip next instruction if Vx = kk.', () => {
 })
 
 test('4xkk - SNE Vx, byte [TRUE] - Skip next instruction if Vx != kk.', () => {
+  const opcode = 0x4422
+  const SNE: Instruction = getInstruction(opcode)
   const x = 4
   const kk = 0x0011
   const testState = initialState()
   testState.V[x] = kk
-  
-  const opcode = 0x4422
-  const SNE: Instruction = getInstruction(opcode)
 
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SNE))
@@ -120,14 +116,13 @@ test('4xkk - SNE Vx, byte [TRUE] - Skip next instruction if Vx != kk.', () => {
 })
 
 test('4xkk - SNE Vx, byte [FALSE] - Skip next instruction if Vx != kk.', () => {
+  const opcode = 0x4422
+  const SNE: Instruction = getInstruction(opcode)
   const x = 4
   const kk = 0x0022
   const testState = initialState()
   testState.V[x] = kk
   
-  const opcode = 0x4422
-  const SNE: Instruction = getInstruction(opcode)
-
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SNE))
 
@@ -137,14 +132,13 @@ test('4xkk - SNE Vx, byte [FALSE] - Skip next instruction if Vx != kk.', () => {
 })
 
 test('5xy0 - SE Vx, Vy [TRUE] - Skip next instruction if Vx = Vy.', () => {
+  const opcode = 0x5460
+  const SE_VX_VY: Instruction = getInstruction(opcode)
   const x = 4
   const y = 6
   const testState = initialState()
   testState.V[x] = 0xab
   testState.V[y] = 0xab
-     
-  const opcode = 0x5460
-  const SE_VX_VY: Instruction = getInstruction(opcode)
 
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SE_VX_VY))
@@ -155,15 +149,14 @@ test('5xy0 - SE Vx, Vy [TRUE] - Skip next instruction if Vx = Vy.', () => {
 })
 
 test('5xy0 - SE Vx, Vy [FALSE] - Skip next instruction if Vx = Vy.', () => {
+  const opcode = 0x5460
+  const SE_VX_VY: Instruction = getInstruction(opcode)
   const x = 4
   const y = 6
   const testState = initialState()
   testState.V[x] = 0xab
   testState.V[y] = 0xcd
-     
-  const opcode = 0x5460
-  const SE_VX_VY: Instruction = getInstruction(opcode)
-
+  
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SE_VX_VY))
 
@@ -300,7 +293,7 @@ test('8xy5 - SUB Vx, Vy [NOT BORROW] - Set Vx = Vx - Vy, set VF = NOT borrow.', 
   expect(store.getState().V[0xf]).toBe(1)
 })
 
-test('8xy5 - SUB Vx, Vy [W/ BORROW] - Set Vx = Vx - Vy, set VF = NOT borrow.', () => {
+test('8xy5 - SUB Vx, Vy [BORROW] - Set Vx = Vx - Vy, set VF = NOT borrow.', () => {
   const opcode = 0x85b5
   const SUB: Instruction = getInstruction(opcode)
   const testState = initialState()
@@ -311,6 +304,145 @@ test('8xy5 - SUB Vx, Vy [W/ BORROW] - Set Vx = Vx - Vy, set VF = NOT borrow.', (
 
   expect(SUB.name).toBe('SUB')
   expect(SUB.opcode).toBe(opcode)
-  expect(store.getState().V[5]).toBe(0)
+  expect(store.getState().V[5]).toBe(0xff)
   expect(store.getState().V[0xf]).toBe(0)
 })
+
+test('8xy6 - SHR Vx {, Vy} [Least-Significant bit of Vx = 1] - Set Vx = Vx SHR 1.', () => {
+  const opcode = 0x8df6
+  const SHR: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[0xd] = 0b111101
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SHR))
+  
+  expect(SHR.name).toBe('SHR')
+  expect(SHR.opcode).toBe(opcode)
+  expect(store.getState().V[0xd]).toBe(30)
+  expect(store.getState().V[0xf]).toBe(1)
+})
+
+test('8xy6 - SHR Vx {, Vy} [Least-Significant bit of Vx = 0] - Set Vx = Vx SHR 1.', () => {
+  const opcode = 0x8df6
+  const SHR: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[0xd] = 0b111110
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SHR))
+  
+  expect(SHR.name).toBe('SHR')
+  expect(SHR.opcode).toBe(opcode)
+  expect(store.getState().V[0xd]).toBe(31)
+  expect(store.getState().V[0xf]).toBe(0)
+})
+
+test('8xy7 - SUBN Vx, Vy [NOT BORROW] - Set Vx = Vy - Vx, set VF = NOT borrow.', () => {
+  const opcode = 0x85b7
+  const SUBN: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[5] = 30
+  testState.V[0xb] = 100
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SUBN))
+
+  expect(SUBN.name).toBe('SUBN')
+  expect(SUBN.opcode).toBe(opcode)
+  expect(store.getState().V[5]).toBe(70)
+  expect(store.getState().V[0xf]).toBe(1)
+})
+
+test('8xy7 - SUBN Vx, Vy [BORROW] - Set Vx = Vy - Vx, set VF = NOT borrow.', () => {
+  const opcode = 0x85b7
+  const SUBN: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[5] = 120
+  testState.V[0xb] = 100
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SUBN))
+
+  expect(SUBN.name).toBe('SUBN')
+  expect(SUBN.opcode).toBe(opcode)
+  expect(store.getState().V[5]).toBe(0xff)
+  expect(store.getState().V[0xf]).toBe(0)
+})
+
+test('8xyE - SHL Vx {, Vy} [Most-Significant = 1] - Set Vx = Vx SHL 1.', () => {
+  const opcode = 0x825e
+  const SHL: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[2] = 0b10101010
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SHL))
+
+  expect(SHL.name).toBe('SHL')
+  expect(SHL.opcode).toBe(opcode)
+  expect(store.getState().V[2]).toBe(255)
+  expect(store.getState().V[0xf]).toBe(1)
+})
+
+test('8xyE - SHL Vx {, Vy} [Most-Significant = 0] - Set Vx = Vx SHL 1.', () => {
+  const opcode = 0x825e
+  const SHL: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[2] = 0b00101010
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SHL))
+
+  expect(SHL.name).toBe('SHL')
+  expect(SHL.opcode).toBe(opcode)
+  expect(store.getState().V[2]).toBe(84)
+  expect(store.getState().V[0xf]).toBe(0)
+})
+
+test('9xy0 - SNE Vx, Vy [Vx != Vy] - Skip next instruction if Vx != Vy.', () => {
+  const opcode = 0x9340
+  const SNE_VX_VY: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[3] = 0xab
+  testState.V[4] = 0xdd
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SNE_VX_VY))
+  
+  expect(SNE_VX_VY.name).toBe('SNE_VX_VY')
+  expect(SNE_VX_VY.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x202)
+})
+
+test('9xy0 - SNE Vx, Vy [Vx == Vy] - Skip next instruction if Vx != Vy.', () => {
+  const opcode = 0x9340
+  const SNE_VX_VY: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[3] = 0xab
+  testState.V[4] = 0xab
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SNE_VX_VY))
+  
+  expect(SNE_VX_VY.name).toBe('SNE_VX_VY')
+  expect(SNE_VX_VY.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x200)
+})
+
+test('Annn - LD I, addr - Set I = nnn.', () => {
+  const opcode = 0xA23c
+  const LD_I: Instruction = getInstruction(opcode)
+  const store = createStore(CPUReducer)
+  store.dispatch(executeCommand(LD_I))
+
+  expect(LD_I.name).toBe('LD_I')
+  expect(LD_I.opcode).toBe(opcode)
+  expect(store.getState().I).toBe(0x23c)
+})
+
+test('Bnnn - JP V0, addr - Jump to location nnn + V0.', () => {
+  const opcode = 0xb231
+  const JP_V0: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.V[0] = 90
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(JP_V0))
+
+  expect(JP_V0.name).toBe('JP_V0')
+  expect(JP_V0.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(651)
+})
+

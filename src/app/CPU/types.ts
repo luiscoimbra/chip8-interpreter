@@ -5,5 +5,6 @@ export interface Instruction {
   mask: number,
   pattern: Opcode,
   opcode: Opcode,
+  rnd?: number
 }
 

@@ -120,8 +120,57 @@ const SUB:Instruction = {
   opcode: 0
 }
 
+// Set Vx = Vx SHR 1.
+const SHR:Instruction = {
+  name: 'SHR',
+  mask: 0xf00f,
+  pattern: 0x8006,
+  opcode: 0
+}
+
+// Set Vx = Vy - Vx, set VF = NOT borrow.
+const SUBN:Instruction = {
+  name: 'SUBN',
+  mask: 0xf00f,
+  pattern: 0x8007,
+  opcode: 0
+}
+
+// Set Vx = Vx SHL 1.
+const SHL:Instruction = {
+  name: 'SHL',
+  mask: 0xf00f,
+  pattern: 0x800e,
+  opcode: 0
+}
+
+// Skip next instruction if Vx != Vy.
+const SNE_VX_VY: Instruction = {
+  name: 'SNE_VX_VY',
+  mask: 0xf00f,
+  pattern: 0x9000,
+  opcode: 0
+}
+
+// Set I = nnn.
+const LD_I: Instruction = {
+  name: 'LD_I',
+  mask: 0xf000,
+  pattern: 0xa000,
+  opcode: 0
+}
+
+// Jump to location nnn + V0.
+const JP_V0: Instruction = {
+  name: 'JP_V0',
+  mask: 0xf000,
+  pattern: 0xb000,
+  opcode: 0
+}
+
 export default [
   CLS, RET, JP, CALL, SE_VX_BYTE, SNE, SE_VX_VY, LD_VX_BYTE, 
-  ADD_VX_BYTE, LD_VX_VY, OR, AND, XOR, ADD_VX_VY, SUB
+  ADD_VX_BYTE, LD_VX_VY, OR, AND, XOR, ADD_VX_VY, SUB, SHR, SUBN,
+  SHL, SNE_VX_VY, LD_I, JP_V0
 ]
 

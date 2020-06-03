@@ -49,7 +49,7 @@ export function CPUReducer(
     case COMMAND:
 
       switch(action.command.name) {
-        case 'CLS':
+        case 'CLS': 
           return {
             ...state,
             UI: cleanUI()
@@ -182,11 +182,69 @@ export function CPUReducer(
           const { x, y } = getVars(action.command)
           const V  = new Uint8Array(state.V)
           const sub = V[x] - V[y]
-          V[x] = (sub >= 0) ? sub : 0
+          V[x] = (sub >= 0) ? sub : 0xff
           V[0xf] = (sub >= 0) ? 1 : 0
           return {
             ...state,
             V
+          }
+        }
+
+        case 'SHR': {
+          const { x } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[0xf] = V[x] & 1
+          V[x] = V[x] >> 1
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'SUBN': {
+          const { x, y } = getVars(action.command)
+          const V  = new Uint8Array(state.V)
+          const sub = V[y] - V[x]
+          V[x] = (sub >= 0) ? sub : 0xff
+          V[0xf] = (sub >= 0) ? 1 : 0
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'SHL': {
+          const { x } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[0xf] = V[x] >> 7
+          V[x] = (V[x] << 1 > 0xff) ? 0xff : V[x] << 1
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'SNE_VX_VY': {
+          const { x, y } = getVars(action.command)
+          return {
+            ...state,
+            PC: (state.V[x] != state.V[y]) ? state.PC + 2 : state.PC
+          }
+        }
+
+        case 'LD_I': {
+          const { nnn } = getVars(action.command)
+          return {
+            ...state,
+            I: nnn
+          }
+        }
+
+        case 'JP_V0': {
+          const { nnn } = getVars(action.command)
+          return {
+            ...state,
+            PC: nnn + state.V[0]
           }
         }
 
