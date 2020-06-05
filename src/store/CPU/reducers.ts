@@ -3,9 +3,12 @@ import { MEMORY_OFFSET } from "../../app/constants/Processor";
 import hexToDec from "../../app/util/hexToDec";
 import getVars from "../../app/CPU/getVars";
 
+const DISPLAY_HEIGHT: number = 32
+const DISPLAY_WIDTH: number = 64
+
 // Fixed viewport size 64x32 with zero values
 export const cleanUI = ():Array<Array<number>> => 
-  Array(64).fill(null).map(() => Array(32).fill(null).map(a => 0))
+  Array(DISPLAY_HEIGHT).fill(null).map(() => Array(DISPLAY_WIDTH).fill(null).map(a => 0))
 
 export const initialState = ():CPU => ({
   memory: new Uint8Array(4096),
@@ -70,7 +73,7 @@ export function CPUReducer(
 
         case 'CALL': {
           const stack = new Uint16Array(state.stack)
-          stack[15] = state.PC
+          stack[0xf] = state.PC
           return {
             ...state,
             SP: state.SP + 1,
@@ -245,6 +248,54 @@ export function CPUReducer(
           return {
             ...state,
             PC: nnn + state.V[0]
+          }
+        }
+
+        case 'RND': {
+          const { x, kk } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          V[x] = action.command.rnd & kk 
+          return {
+            ...state,
+            V
+          }
+        }
+
+        case 'DRW': {
+          let { x, y, n } = getVars(action.command)
+          const V = new Uint8Array(state.V)
+          const UI = [...state.UI]
+          const { I, memory } = state
+
+          // set "no collision" - this will be overriden if colission detected 
+          // when assigning pixels
+          V[0xf] = 0
+
+          let initialX = V[x]
+          y = V[y]
+
+          // Ready each memory address starting from Register I until n
+          for (let i = 0; i < n; i++) {
+            const spriteX = memory[I + i]
+            x = initialX
+
+            for (let j = 0; j < 8; j++) {
+              let bit = spriteX & (1 << (7 - j)) ? 1 : 0
+ 
+              if (UI[y][x] & bit) {
+                V[0xf] = 1
+              }
+
+              UI[y][x] ^= bit
+              x++
+            }
+            y++
+          }
+          
+          return {
+            ...state,
+            V,
+            UI
           }
         }
 

@@ -11,7 +11,7 @@ test('00E0 - CLS - clear the display', () => {
   testState.UI[0][0] = 1
   testState.UI[1][1] = 1
   testState.UI[2][2] = 1
-  testState.UI[60][31] = 1
+  testState.UI[31][60] = 1
   
   const store = createStore(CPUReducer, testState)
   
@@ -446,3 +446,51 @@ test('Bnnn - JP V0, addr - Jump to location nnn + V0.', () => {
   expect(store.getState().PC).toBe(651)
 })
 
+test('Cxkk - RND Vx, byte - Set Vx = random byte AND kk.', () => {
+  const opcode = 0xc38c
+  const RND: Instruction = getInstruction(opcode)
+  const store = createStore(CPUReducer)
+  
+  expect(RND.name).toBe('RND')
+  expect(RND.opcode).toBe(opcode)
+  expect(RND.rnd).toBeGreaterThanOrEqual(0)
+  expect(RND.rnd).toBeLessThan(256)
+  
+  RND.rnd = 130
+  store.dispatch(executeCommand(RND))
+  
+  expect(store.getState().V[3]).toBe(128)
+})
+
+test('Dxyn - DRW Vx, Vy, nibble [NO COLLISION] - Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.', () => {
+  const opcode = 0xd465
+  const DRW: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.I = 0x400
+  testState.V[4] = 2  
+  testState.V[6] = 3
+
+  // sprite of 0
+  testState.memory[testState.I] = 0b11110000
+  testState.memory[testState.I + 1] = 0b10010000
+  testState.memory[testState.I + 2] = 0b10010000
+  testState.memory[testState.I + 3] = 0b10010000
+  testState.memory[testState.I + 4] = 0b11110000
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(DRW))
+
+  const { UI, V } = store.getState()
+  
+  expect(V[0xf]).toBe(0)
+  expect(UI[1].splice(0, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[2].splice(0, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[3].splice(0, 10)).toEqual([0,0,1,1,1,1,0,0,0,0])
+  expect(UI[4].splice(0, 10)).toEqual([0,0,1,0,0,1,0,0,0,0])
+  expect(UI[5].splice(0, 10)).toEqual([0,0,1,0,0,1,0,0,0,0])
+  expect(UI[6].splice(0, 10)).toEqual([0,0,1,0,0,1,0,0,0,0])
+  expect(UI[7].splice(0, 10)).toEqual([0,0,1,1,1,1,0,0,0,0])
+  expect(UI[8].splice(0, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[9].splice(0, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+
+})

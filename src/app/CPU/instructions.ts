@@ -168,9 +168,25 @@ const JP_V0: Instruction = {
   opcode: 0
 }
 
+// Set Vx = random byte AND kk.
+const RND: Instruction = {
+  name: 'RND',
+  mask: 0xf000,
+  pattern: 0xc000,
+  opcode: 0
+}
+
+// Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+const DRW: Instruction = {
+  name: 'DRW',
+  mask: 0xf000,
+  pattern: 0xd000,
+  opcode: 0
+}
+
 export default [
   CLS, RET, JP, CALL, SE_VX_BYTE, SNE, SE_VX_VY, LD_VX_BYTE, 
   ADD_VX_BYTE, LD_VX_VY, OR, AND, XOR, ADD_VX_VY, SUB, SHR, SUBN,
-  SHL, SNE_VX_VY, LD_I, JP_V0
+  SHL, SNE_VX_VY, LD_I, JP_V0, RND, DRW
 ]
 
