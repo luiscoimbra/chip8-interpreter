@@ -21,8 +21,16 @@ const incrementPC = (): CPUActionTypes => (
   }
 )
 
+const loadFontset = (fontset: Uint8Array): CPUActionTypes => (
+  {
+    type: 'LOAD_FONTSET',
+    fontset
+  }
+)
+
 export {
   loadRom,
   executeCommand,
-  incrementPC
+  incrementPC,
+  loadFontset
 }

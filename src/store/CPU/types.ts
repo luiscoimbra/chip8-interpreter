@@ -32,11 +32,15 @@ export interface CPU {
 
   // Maps references to UI 64x32 
   UI: Array<Array<number>>
+
+  // Maps key current state
+  KEY: Array<number>
 }
 
 export const LOAD_ROM = 'LOAD_ROM'
 export const COMMAND = 'COMMAND'
 export const INCREMENT_PC = 'INCREMENT_PC'
+export const LOAD_FONTSET = 'LOAD_FONTSET'
 
 interface LoadRomAction {
   type: typeof LOAD_ROM,
@@ -52,4 +56,13 @@ interface IncrementPCAction {
   type: typeof INCREMENT_PC
 }
 
-export type CPUActionTypes = LoadRomAction | CommandAction | IncrementPCAction
+interface LoadFontset {
+  type: typeof LOAD_FONTSET,
+  fontset: Uint8Array
+}
+
+export type CPUActionTypes =
+ | LoadRomAction 
+ | CommandAction
+ | IncrementPCAction
+ | LoadFontset

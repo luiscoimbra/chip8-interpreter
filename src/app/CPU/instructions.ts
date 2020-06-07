@@ -184,9 +184,25 @@ const DRW: Instruction = {
   opcode: 0
 }
 
+// Skip next instruction if key with the value of Vx is pressed.
+const SKP_VX: Instruction = {
+  name: 'SKP_VX',
+  mask: 0xf0ff,
+  pattern: 0xe09e,
+  opcode: 0
+}
+
+// Skip next instruction if key with the value of Vx is not pressed.
+const SKNP_VX: Instruction = {
+  name: 'SKNP_VX',
+  mask: 0xf0ff,
+  pattern: 0xe0a1,
+  opcode: 0
+}
+
 export default [
   CLS, RET, JP, CALL, SE_VX_BYTE, SNE, SE_VX_VY, LD_VX_BYTE, 
   ADD_VX_BYTE, LD_VX_VY, OR, AND, XOR, ADD_VX_VY, SUB, SHR, SUBN,
-  SHL, SNE_VX_VY, LD_I, JP_V0, RND, DRW
+  SHL, SNE_VX_VY, LD_I, JP_V0, RND, DRW, SKP_VX, SKNP_VX
 ]
 

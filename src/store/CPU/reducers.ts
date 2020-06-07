@@ -1,4 +1,4 @@
-import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC } from "./types";
+import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC, LOAD_FONTSET } from "./types";
 import { MEMORY_OFFSET } from "../../app/constants/Processor";
 import hexToDec from "../../app/util/hexToDec";
 import getVars from "../../app/CPU/getVars";
@@ -19,7 +19,8 @@ export const initialState = ():CPU => ({
   PC: MEMORY_OFFSET,
   SP: 0,
   stack: new Uint16Array(16),
-  UI: cleanUI()
+  UI: cleanUI(),
+  KEY: Array(0xf).fill(0)
 })
 
 export function CPUReducer(
@@ -48,6 +49,19 @@ export function CPUReducer(
         ...state,
         memory
       }
+
+    case LOAD_FONTSET: {
+      const memory = new Uint8Array(state.memory)
+
+      for (let i: number = 0; i < 80; i++) {
+        memory[i] = action.fontset[i]
+      }
+
+      return {
+        ...state,
+        memory
+      }
+    }
 
     case COMMAND:
 
@@ -298,6 +312,27 @@ export function CPUReducer(
             UI
           }
         }
+
+        case 'SKP_VX': {
+          const { x } = getVars(action.command)
+          const key = state.V[x]
+          return {
+            ...state,
+            // check if key Vx is pressed (1)
+            PC: (state.KEY[key]) ? state.PC + 2 : state.PC
+          }
+        }
+
+        case 'SKNP_VX': {
+          const { x } = getVars(action.command)
+          const key = state.V[x]
+          return {
+            ...state,
+            // check if key Vx is up (0)
+            PC: (!state.KEY[key]) ? state.PC + 2 : state.PC
+          }
+        }
+
 
         default:
           return state

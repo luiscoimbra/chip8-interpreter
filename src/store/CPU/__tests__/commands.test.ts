@@ -492,5 +492,101 @@ test('Dxyn - DRW Vx, Vy, nibble [NO COLLISION] - Display n-byte sprite starting 
   expect(UI[7].splice(0, 10)).toEqual([0,0,1,1,1,1,0,0,0,0])
   expect(UI[8].splice(0, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
   expect(UI[9].splice(0, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
-
 })
+
+test('Dxyn - DRW Vx, Vy, nibble [W/ COLLISION] - Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.', () => {
+  const opcode = 0xdad5
+  const DRW: Instruction = getInstruction(opcode)
+  const testState = initialState()
+  testState.I = 0x400
+  testState.V[0xa] = 0xa  
+  testState.V[0xd] = 0xf
+  testState.UI[15][12] = 0b1
+  testState.UI[18][11] = 0b1
+
+  // sprite of 7
+  testState.memory[testState.I] =     0b11110000
+  testState.memory[testState.I + 1] = 0b00010000
+  testState.memory[testState.I + 2] = 0b00100000
+  testState.memory[testState.I + 3] = 0b01000000
+  testState.memory[testState.I + 4] = 0b01000000
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(DRW))
+
+  const { UI, V } = store.getState()
+  
+  expect(V[0xf]).toBe(1)
+  expect(UI[13].splice(8, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[14].splice(8, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[15].splice(8, 10)).toEqual([0,0,1,1,0,1,0,0,0,0])
+  expect(UI[16].splice(8, 10)).toEqual([0,0,0,0,0,1,0,0,0,0])
+  expect(UI[17].splice(8, 10)).toEqual([0,0,0,0,1,0,0,0,0,0])
+  expect(UI[18].splice(8, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[19].splice(8, 10)).toEqual([0,0,0,1,0,0,0,0,0,0])
+  expect(UI[20].splice(8, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+  expect(UI[21].splice(8, 10)).toEqual([0,0,0,0,0,0,0,0,0,0])
+})
+
+test('Ex9E - SKP Vx - [KEY is UP] Skip next instruction if key with the value of Vx is pressed.', () => {
+  const opcode = 0xe39e
+  const SKP_VX = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.PC = 0x401
+  testState.V[0x3] = 0xb
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SKP_VX))
+  
+  expect(SKP_VX.name).toBe('SKP_VX')
+  expect(SKP_VX.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x401)
+})
+
+test('Ex9E - SKP Vx - [KEY is DOWN] Skip next instruction if key with the value of Vx is pressed.', () => {
+  const opcode = 0xe39e
+  const SKP_VX = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.PC = 0x401
+  testState.V[0x3] = 0xb
+  testState.KEY[0xb] = 1
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SKP_VX))
+  
+  expect(SKP_VX.name).toBe('SKP_VX')
+  expect(SKP_VX.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x403)
+})
+
+test('ExA1 - SKNP Vx - [KEY is DOWN] Skip next instruction if key with the value of Vx is not pressed.', () => {
+  const opcode = 0xe3a1
+  const SKNP_VX = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.PC = 0x401
+  testState.V[0x3] = 0xb
+  testState.KEY[0xb] = 1
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SKNP_VX))
+  
+  expect(SKNP_VX.name).toBe('SKNP_VX')
+  expect(SKNP_VX.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x401)
+})
+
+test('ExA1 - SKNP Vx - [KEY is UP] Skip next instruction if key with the value of Vx is not pressed.', () => {
+  const opcode = 0xe3a1
+  const SKNP_VX = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.PC = 0x401
+  testState.V[0x3] = 0xb
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(SKNP_VX))
+
+  expect(SKNP_VX.name).toBe('SKNP_VX')
+  expect(SKNP_VX.opcode).toBe(opcode)
+  expect(store.getState().PC).toBe(0x403)
+})
+
