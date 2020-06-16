@@ -200,9 +200,83 @@ const SKNP_VX: Instruction = {
   opcode: 0
 }
 
+// Set Vx = delay timer value.
+const LD_VX_DT: Instruction = {
+  name: 'LD_VX_DT',
+  mask: 0xf0ff,
+  pattern: 0xf007,
+  opcode: 0
+}
+
+// Wait for a key press, store the value of the key in Vx.
+const LD_VX_K: Instruction = {
+  name: 'LD_VX_K',
+  mask: 0xf0ff,
+  pattern: 0xf00a,
+  opcode: 0
+}
+
+// Set delay timer = Vx.
+const LD_DT_VX: Instruction = {
+  name: 'LD_DT_VX',
+  mask: 0xf0ff,
+  pattern: 0xf015,
+  opcode: 0
+}
+
+// Set sound timer = Vx.
+const LD_ST_VX: Instruction = {
+  name: 'LD_ST_VX',
+  mask: 0xf0ff,
+  pattern: 0xf018,
+  opcode: 0
+}
+
+// Set I = I + Vx.
+const ADD_I_VX: Instruction = {
+  name: 'ADD_I_VX',
+  mask: 0xf0ff,
+  pattern: 0xf01e,
+  opcode: 0
+}
+
+// Set I = location of sprite for digit Vx.
+const LD_F_VX: Instruction = {
+  name: 'LD_F_VX',
+  mask: 0xf0ff,
+  pattern: 0xf029,
+  opcode: 0
+}
+
+// Store BCD representation of Vx in memory locations I, I+1, and I+2.
+const LD_B_VX: Instruction = {
+  name: 'LD_B_VX',
+  mask: 0xf0ff,
+  pattern: 0xf033,
+  opcode: 0
+}
+
+// Store registers V0 through Vx in memory starting at location I.
+const LD_I_VX: Instruction = {
+  name: 'LD_I_VX',
+  mask: 0xf0ff,
+  pattern: 0xf055,
+  opcode: 0
+}
+
+// Read registers V0 through Vx from memory starting at location I.
+const LD_VX_I: Instruction = {
+  name: 'LD_VX_I',
+  mask: 0xf0ff,
+  pattern: 0xf065,
+  opcode: 0
+}
+
 export default [
   CLS, RET, JP, CALL, SE_VX_BYTE, SNE, SE_VX_VY, LD_VX_BYTE, 
   ADD_VX_BYTE, LD_VX_VY, OR, AND, XOR, ADD_VX_VY, SUB, SHR, SUBN,
-  SHL, SNE_VX_VY, LD_I, JP_V0, RND, DRW, SKP_VX, SKNP_VX
+  SHL, SNE_VX_VY, LD_I, JP_V0, RND, DRW, SKP_VX, SKNP_VX, LD_VX_DT,
+  LD_VX_K, LD_DT_VX, LD_ST_VX, ADD_I_VX, LD_F_VX, LD_B_VX, LD_I_VX,
+  LD_VX_I
 ]
 

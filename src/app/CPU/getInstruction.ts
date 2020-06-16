@@ -11,6 +11,10 @@ export default (opcode: Opcode): Instruction => {
 
   const instruction = instructions.find((i: Instruction) => 
     ((opcode & i.mask) === i.pattern))
+
+  if (!instruction) {
+    throw Error("Instruction not found!")
+  }
     
   return {
     ...instruction,

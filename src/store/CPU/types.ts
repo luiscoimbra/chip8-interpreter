@@ -35,6 +35,8 @@ export interface CPU {
 
   // Maps key current state
   KEY: Array<number>
+
+  halted: false
 }
 
 export const LOAD_ROM = 'LOAD_ROM'

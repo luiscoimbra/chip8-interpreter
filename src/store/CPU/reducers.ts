@@ -20,7 +20,8 @@ export const initialState = ():CPU => ({
   SP: 0,
   stack: new Uint16Array(16),
   UI: cleanUI(),
-  KEY: Array(0xf).fill(0)
+  KEY: Array(0xf).fill(0),
+  halted: false
 })
 
 export function CPUReducer(
@@ -333,12 +334,105 @@ export function CPUReducer(
           }
         }
 
+        case 'LD_VX_DT': {
+          const { x } = getVars(action.command)
+          const { DT } = state
+          const V = new Uint8Array(state.V)
+          V[x] = DT
+          return {
+            ...state,
+            V
+          }
+        }
+
+        //////// LD_VX_K ///////
+
+        case 'LD_DT_VX': {
+          const { x } = getVars(action.command)
+          return {
+            ...state,
+            DT: state.V[x]
+          }
+        }
+
+        case 'LD_ST_VX': {
+          const { x } = getVars(action.command)
+          return {
+            ...state,
+            ST: state.V[x]
+          }
+        }
+
+        case 'ADD_I_VX': {
+          const { x } = getVars(action.command)
+          return {
+            ...state,
+            I: state.I + state.V[x]
+          }
+        }
+
+        case 'LD_F_VX': {
+          const { x } = getVars(action.command)
+          return {
+            ...state,
+            I: state.V[x] * 5
+          }
+        }
+
+        case 'LD_B_VX': {
+          const { x } = getVars(action.command)
+          let Vx = state.V[x]
+          const hundreds = Math.floor(Vx / 100)
+          Vx = Vx - hundreds * 100
+          const tens = Math.floor(Vx / 10);
+          Vx = Vx - tens * 10
+          const ones = Math.floor(Vx)
+
+          const memory = new Uint8Array(state.memory)
+          memory[state.I] = hundreds
+          memory[state.I + 1] = tens 
+          memory[state.I + 2] = ones
+
+          return {
+            ...state,
+            memory
+          }
+        }
+
+        case 'LD_I_VX': {
+          const { x } = getVars(action.command)
+          const { V, I } = state
+          const memory = new Uint8Array(state.memory)
+          
+          for (let i = 0; i <= x; i++) {
+            memory[I + i] = V[i]
+          }
+
+          return {
+            ...state,
+            memory
+          }
+        }
+
+        case 'LD_VX_I': {
+          const { x } = getVars(action.command)
+          const { memory, I } = state
+          const V = new Uint8Array(state.V)
+          
+          for (let i = 0; i <= x; i++) {
+            V[i] = memory[I + i] 
+          }
+
+          return {
+            ...state,
+            V
+          }
+        }
 
         default:
           return state
 
       }
-
 
     default:
       return state

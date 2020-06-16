@@ -19,8 +19,7 @@ export default ({
   
   const { Fetch, Decode, Execute } = getCPU(store)
 
-  let count = 5
-
+  let count = 20
 
   const run = () => {
     let { PC } = store.getState()   
@@ -28,7 +27,6 @@ export default ({
     let instruction:Instruction = Decode(opcode)
     Execute(instruction)
     store.dispatch(incrementPC())
-
   }
 
   while(count > 0) {

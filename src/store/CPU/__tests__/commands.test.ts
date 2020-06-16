@@ -590,3 +590,154 @@ test('ExA1 - SKNP Vx - [KEY is UP] Skip next instruction if key with the value o
   expect(store.getState().PC).toBe(0x403)
 })
 
+test('Fx07 - LD Vx, DT - Set Vx = delay timer value.', () => {
+  const opcode = 0xfc07
+  const LD_VX_DT: Instruction = getInstruction(opcode)
+  
+  const testState = initialState()
+  testState.DT = 0x10
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_VX_DT))
+
+  expect(LD_VX_DT.name).toBe('LD_VX_DT')
+  expect(LD_VX_DT.opcode).toBe(opcode)
+  expect(store.getState().V[0xc]).toBe(0x10)
+})
+
+// @TODO
+// test('Fx0A - LD Vx, K - Wait for a key press, store the value of the key in Vx.', () => {
+//   const opcode = 0xf80a
+//   const LD_VX_K: Instruction = getInstruction(opcode)
+
+//   const testState = initialState()
+
+//   // KEY 9 is pressed
+//   testState.KEY[0x9] = 0x39
+
+//   const store = createStore(CPUReducer, testState)
+//   store.dispatch(executeCommand(LD_VX_K))
+
+//   expect(LD_VX_K.name).toBe('LD_VX_K')
+//   expect(LD_VX_K.opcode).toBe(opcode)
+//   // 0x39 hex for 9
+//   expect(store.getState().V[0x8]).toBe(0x39)
+// })
+
+test('Fx15 - LD DT, Vx - Set delay timer = Vx.', () => {
+  const opcode = 0xf415
+  const LD_DT_VX: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.V[0x4] = 0x40
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_DT_VX))
+  
+  expect(LD_DT_VX.name).toBe('LD_DT_VX')
+  expect(LD_DT_VX.opcode).toBe(opcode)
+  expect(store.getState().DT).toBe(0x40)
+})
+
+test('Fx18 - LD ST, Vx - Set sound timer = Vx.', () => {
+  const opcode = 0xf418
+  const LD_ST_VX: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.V[0x4] = 0x40
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_ST_VX))
+  
+  expect(LD_ST_VX.name).toBe('LD_ST_VX')
+  expect(LD_ST_VX.opcode).toBe(opcode)
+  expect(store.getState().ST).toBe(0x40)
+})
+
+test('Fx1E - ADD I, Vx - Set I = I + Vx.', () => {
+  const opcode = 0xfa1e
+  const ADD_I_VX: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.I = 0x200
+  testState.V[0xa] = 0x11
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(ADD_I_VX))
+
+  expect(ADD_I_VX.name).toBe('ADD_I_VX')
+  expect(ADD_I_VX.opcode).toBe(opcode)
+  expect(store.getState().I).toBe(0x211)
+})
+
+test('Fx29 - LD F, Vx - Set I = location of sprite for digit Vx.', () => {
+  const opcode = 0xf729
+  const LD_F_VX: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  // position of 0x2 is 0xa (10)
+  testState.V[0x7] = 0x2
+  testState.I = 0
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_F_VX))
+  
+  expect(LD_F_VX.name).toBe('LD_F_VX')
+  expect(LD_F_VX.opcode).toBe(opcode)
+  expect(store.getState().I).toBe(10)
+})
+
+test('Fx33 - LD B, Vx - Store BCD representation of Vx in memory locations I, I+1, and I+2.', () => {
+  const opcode = 0xf533
+  const LD_B_VX: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.I = 0x250
+  testState.V[0x5] = 189
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_B_VX))
+
+  expect(LD_B_VX.name).toBe('LD_B_VX')
+  expect(LD_B_VX.opcode).toBe(opcode)
+  expect(store.getState().memory[0x250]).toBe(1)
+  expect(store.getState().memory[0x251]).toBe(8)
+  expect(store.getState().memory[0x252]).toBe(9)
+})
+
+test('Fx55 - LD [I], Vx - Store registers V0 through Vx in memory starting at location I.', () => {
+  const opcode = 0xfd55
+  const LD_I_VX: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  const V = [5, 2, 66, 22, 1, 7, 10, 111, 200, 180, 144, 0, 34, 44, 0, 0]
+  testState.V = new Uint8Array(V)
+  testState.I = 0x310
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_I_VX))
+
+  expect(LD_I_VX.name).toBe('LD_I_VX')
+  expect(LD_I_VX.opcode).toBe(opcode)
+  const { memory } = store.getState()
+  expect(memory.slice(0x310, 0x320).toString()).toBe(V.toString())
+})
+
+test('Fx65 - LD Vx, [I] - Read registers V0 through Vx from memory starting at location I.', () => {
+  const opcode = 0xf465
+  const LD_VX_I: Instruction = getInstruction(opcode)
+
+  const testState = initialState()
+  testState.I = 0x400
+  testState.memory[0x400] = 12
+  testState.memory[0x401] = 20
+  testState.memory[0x402] = 28
+  testState.memory[0x403] = 36
+  testState.memory[0x404] = 42
+
+  const store = createStore(CPUReducer, testState)
+  store.dispatch(executeCommand(LD_VX_I))
+  
+  expect(LD_VX_I.name).toBe('LD_VX_I')
+  expect(LD_VX_I.opcode).toBe(opcode)
+  const { V } = store.getState()
+  expect(V.slice(0, 7).toString()).toBe([12, 20, 28, 36, 42, 0, 0].toString())
+})
