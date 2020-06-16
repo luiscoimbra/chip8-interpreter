@@ -2,9 +2,7 @@ import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC, LOAD_FONTSET } fr
 import { MEMORY_OFFSET } from "../../app/constants/Processor";
 import hexToDec from "../../app/util/hexToDec";
 import getVars from "../../app/CPU/getVars";
-
-const DISPLAY_HEIGHT: number = 32
-const DISPLAY_WIDTH: number = 64
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../constants";
 
 // Fixed viewport size 64x32 with zero values
 export const cleanUI = ():Array<Array<number>> => 
@@ -282,7 +280,7 @@ export function CPUReducer(
           const UI = [...state.UI]
           const { I, memory } = state
 
-          // set "no collision" - this will be overriden if colission detected 
+          // set "no collision" - this will be overriden if colission is detected 
           // when assigning pixels
           V[0xf] = 0
 
@@ -292,7 +290,7 @@ export function CPUReducer(
           // Ready each memory address starting from Register I until n
           for (let i = 0; i < n; i++) {
             const spriteX = memory[I + i]
-            x = initialX
+            x = initialX 
 
             for (let j = 0; j < 8; j++) {
               let bit = spriteX & (1 << (7 - j)) ? 1 : 0

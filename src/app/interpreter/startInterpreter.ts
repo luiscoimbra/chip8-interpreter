@@ -7,6 +7,7 @@ import { Instruction } from "../CPU/types"
 import DecToHex from "../util/decToHex"
 import getInstruction from "../CPU/getInstruction"
 import getFontset from "../CPU/getFontset"
+import { CPU_CLOCK } from "../constants/Processor"
 
 export default ({
   ROM,
@@ -19,30 +20,27 @@ export default ({
   
   const { Fetch, Decode, Execute } = getCPU(store)
 
-  let count = 20
+  let count = 500
 
   const run = () => {
     let { PC } = store.getState()   
     let opcode:Opcode = Fetch()
-    let instruction:Instruction = Decode(opcode)
+
+    let instruction: Instruction
+    try {
+      instruction = Decode(opcode)
+    } catch(e) {
+      throw Error(e)
+    }
+
     Execute(instruction)
+    View.draw(store.getState().UI)
     store.dispatch(incrementPC())
+    setTimeout(run, 10)
   }
 
-  while(count > 0) {
-    run()
-    count--
-  }
-  
-  // step(store);
 
-  // const step: () => void = (): void => {
-
-    
-  //   View.draw([[1,1,1,1], [1,0,0,1], [1,0,0,1],  [1,0,0,1], [1,1,1,1]])
-  // }
-
-  // step()
+  run()
 
 
 }

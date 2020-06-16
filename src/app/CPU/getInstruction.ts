@@ -13,7 +13,7 @@ export default (opcode: Opcode): Instruction => {
     ((opcode & i.mask) === i.pattern))
 
   if (!instruction) {
-    throw Error("Instruction not found!")
+    throw Error(`Instruction ${opcode} not found!`)
   }
     
   return {

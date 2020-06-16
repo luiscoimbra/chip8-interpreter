@@ -3,3 +3,4 @@
 // CHIP8 interpreter
 // 512
 export const MEMORY_OFFSET:number = 0x200
+export const CPU_CLOCK:number = 1

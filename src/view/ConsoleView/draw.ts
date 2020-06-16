@@ -1,5 +1,5 @@
 export default (UIMap:Array<Array<number>>): void => {
-
+    return;
     console.log(" ---------")
     UIMap.map((y: Array<number>) => {
     

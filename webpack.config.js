@@ -4,7 +4,7 @@ const NodemonPlugin = require('nodemon-webpack-plugin')
 module.exports = {
   entry: './src/index.ts',
   mode: 'development',
-  target: 'node',
+  target: 'web',
   module: {
     rules: [
       {
@@ -16,6 +16,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+  },
+  devServer: {
+    contentBase: './dist'
   },
   output: {
     filename: 'bundle.js',
