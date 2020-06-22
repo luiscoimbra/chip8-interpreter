@@ -32,7 +32,7 @@ export function CPUReducer(
       const { PC } = state
       return {
         ...state,
-        PC: PC + 2
+        PC: PC + action.value
       }
 
     case LOAD_ROM:
@@ -68,36 +68,44 @@ export function CPUReducer(
         case 'CLS': 
           return {
             ...state,
-            UI: cleanUI()
+            UI: cleanUI(),
+            PC: state.PC + 2
           }
 
         case 'RET':
           return {
             ...state,
-            PC: state.stack[15],
+            PC: state.stack[state.SP],
             SP: state.SP - 1
           }
         
-        case 'JP':
+        case 'JP': {
+          const { nnn } = getVars(action.command)
           return {
             ...state,
-            PC: action.command.opcode & 0x0fff
+            PC: nnn
           }
+        }
 
         case 'CALL': {
+          const { nnn } = getVars(action.command)
           const stack = new Uint16Array(state.stack)
-          stack[0xf] = state.PC
+          let { SP, PC } = state
+
+          SP++
+          stack[SP] = PC + 2
+          PC = nnn
           return {
             ...state,
-            SP: state.SP + 1,
+            SP,
             stack,
-            PC: action.command.opcode & 0x0fff
+            PC
           }
         }
           
         case 'SE_VX_BYTE': {
           const { x, kk } = getVars(action.command)
-          const PC = (state.V[x] === kk) ? state.PC + 2 : state.PC
+          const PC = (state.V[x] === kk) ? state.PC + 4 : state.PC + 2
           return {
             ...state,
             PC
@@ -106,7 +114,7 @@ export function CPUReducer(
 
         case 'SNE': {
           const { x, kk } = getVars(action.command)
-          const PC = (state.V[x] != kk) ? state.PC + 2 : state.PC
+          const PC = (state.V[x] !== kk) ? state.PC + 4 : state.PC + 2
           return {
             ...state,
             PC
@@ -115,7 +123,7 @@ export function CPUReducer(
 
         case 'SE_VX_VY': {
           const { x, y } = getVars(action.command)
-          const PC = (state.V[x] === state.V[y]) ? state.PC + 2 : state.PC 
+          const PC = (state.V[x] === state.V[y]) ? state.PC + 4 : state.PC + 2 
           return {
             ...state,
             PC
@@ -128,7 +136,8 @@ export function CPUReducer(
           V[x] = kk
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -138,7 +147,8 @@ export function CPUReducer(
           V[x] = V[x] + kk
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -148,7 +158,8 @@ export function CPUReducer(
           V[x] = V[y]
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -158,7 +169,8 @@ export function CPUReducer(
           V[x] = V[x] | V[y]
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -168,7 +180,8 @@ export function CPUReducer(
           V[x] = V[x] & V[y]
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -178,31 +191,32 @@ export function CPUReducer(
           V[x] = V[x] ^ V[y]
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
         case 'ADD_VX_VY': {
           const { x, y } = getVars(action.command)
           const V = new Uint8Array(state.V)
-          const sum = V[x] + V[y]
-          V[x] = sum % 0x100
-          V[0xf] = (sum > 0xff) ? 1 : 0
+          V[x] += V[y]
+          V[0xf] = (V[x] + V[y] > 0xff) ? 1 : 0
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
         case 'SUB': {
           const { x, y } = getVars(action.command)
           const V  = new Uint8Array(state.V)
-          const sub = V[x] - V[y]
-          V[x] = (sub >= 0) ? sub : 0xff
-          V[0xf] = (sub >= 0) ? 1 : 0
+          V[0xf] = V[x] > V[y] ? 1 : 0
+          V[x] -= V[y]
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -213,19 +227,20 @@ export function CPUReducer(
           V[x] = V[x] >> 1
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
         case 'SUBN': {
           const { x, y } = getVars(action.command)
           const V  = new Uint8Array(state.V)
-          const sub = V[y] - V[x]
-          V[x] = (sub >= 0) ? sub : 0xff
-          V[0xf] = (sub >= 0) ? 1 : 0
+          V[0xf] = V[y] > V[x] ? 1 : 0
+          V[x] = V[y] - V[x]
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -233,10 +248,11 @@ export function CPUReducer(
           const { x } = getVars(action.command)
           const V = new Uint8Array(state.V)
           V[0xf] = V[x] >> 7
-          V[x] = (V[x] << 1 > 0xff) ? 0xff : V[x] << 1
+          V[x] <<= 1
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -244,7 +260,7 @@ export function CPUReducer(
           const { x, y } = getVars(action.command)
           return {
             ...state,
-            PC: (state.V[x] != state.V[y]) ? state.PC + 2 : state.PC
+            PC: (state.V[x] != state.V[y]) ? state.PC + 4 : state.PC + 2
           }
         }
 
@@ -252,7 +268,8 @@ export function CPUReducer(
           const { nnn } = getVars(action.command)
           return {
             ...state,
-            I: nnn
+            I: nnn,
+            PC: state.PC + 2
           }
         }
 
@@ -270,7 +287,8 @@ export function CPUReducer(
           V[x] = action.command.rnd & kk 
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
@@ -284,31 +302,30 @@ export function CPUReducer(
           // when assigning pixels
           V[0xf] = 0
 
-          let initialX = V[x]
-          y = V[y]
-
-          // Ready each memory address starting from Register I until n
+          // Reading bytes from memory start at I
           for (let i = 0; i < n; i++) {
-            const spriteX = memory[I + i]
-            x = initialX 
+            let spriteByte = memory[I + i]
+            
+            for (let bit = 0; bit < 8; bit++) {
+              // extract the bit from the given sprite byte
+              let value = spriteByte & (1 << (7 - bit)) ? 1 : 0
 
-            for (let j = 0; j < 8; j++) {
-              let bit = spriteX & (1 << (7 - j)) ? 1 : 0
- 
-              if (UI[y][x] & bit) {
+              const w = (V[x] + bit) % DISPLAY_WIDTH
+              const h = (V[y] + i) % DISPLAY_HEIGHT
+
+              if (UI[h][w] & value) {
                 V[0xf] = 1
               }
 
-              UI[y][x] ^= bit
-              x++
+              UI[h][w] ^= value
             }
-            y++
           }
           
           return {
             ...state,
             V,
-            UI
+            UI,
+            PC: state.PC + 2
           }
         }
 
@@ -318,7 +335,7 @@ export function CPUReducer(
           return {
             ...state,
             // check if key Vx is pressed (1)
-            PC: (state.KEY[key]) ? state.PC + 2 : state.PC
+            PC: (state.KEY[key]) ? state.PC + 4 : state.PC + 2
           }
         }
 
@@ -328,7 +345,7 @@ export function CPUReducer(
           return {
             ...state,
             // check if key Vx is up (0)
-            PC: (!state.KEY[key]) ? state.PC + 2 : state.PC
+            PC: (!state.KEY[key]) ? state.PC + 4 : state.PC + 2
           }
         }
 
@@ -339,17 +356,25 @@ export function CPUReducer(
           V[x] = DT
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 
         //////// LD_VX_K ///////
+        case 'LD_VX_K': {
+          return {
+            ...state,
+            PC: state.PC + 2
+          }
+        }
 
         case 'LD_DT_VX': {
           const { x } = getVars(action.command)
           return {
             ...state,
-            DT: state.V[x]
+            DT: state.V[x],
+            PC: state.PC + 2
           }
         }
 
@@ -357,7 +382,8 @@ export function CPUReducer(
           const { x } = getVars(action.command)
           return {
             ...state,
-            ST: state.V[x]
+            ST: state.V[x],
+            PC: state.PC + 2
           }
         }
 
@@ -365,7 +391,8 @@ export function CPUReducer(
           const { x } = getVars(action.command)
           return {
             ...state,
-            I: state.I + state.V[x]
+            I: state.I + state.V[x],
+            PC: state.PC + 2
           }
         }
 
@@ -373,7 +400,8 @@ export function CPUReducer(
           const { x } = getVars(action.command)
           return {
             ...state,
-            I: state.V[x] * 5
+            I: state.V[x] * 5,
+            PC: state.PC + 2
           }
         }
 
@@ -393,7 +421,8 @@ export function CPUReducer(
 
           return {
             ...state,
-            memory
+            memory,
+            PC: state.PC + 2
           }
         }
 
@@ -408,7 +437,8 @@ export function CPUReducer(
 
           return {
             ...state,
-            memory
+            memory,
+            PC: state.PC + 2
           }
         }
 
@@ -423,7 +453,8 @@ export function CPUReducer(
 
           return {
             ...state,
-            V
+            V,
+            PC: state.PC + 2
           }
         }
 

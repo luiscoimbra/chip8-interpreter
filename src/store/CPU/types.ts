@@ -55,7 +55,8 @@ interface CommandAction {
 }
 
 interface IncrementPCAction {
-  type: typeof INCREMENT_PC
+  type: typeof INCREMENT_PC,
+  value: number
 }
 
 interface LoadFontset {

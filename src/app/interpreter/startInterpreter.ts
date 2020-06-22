@@ -20,27 +20,28 @@ export default ({
   
   const { Fetch, Decode, Execute } = getCPU(store)
 
-  let count = 500
+  let count = 180
 
   const run = () => {
     let { PC } = store.getState()   
-    let opcode:Opcode = Fetch()
+    let opcode:Opcode = Fetch();
 
-    let instruction: Instruction
-    try {
-      instruction = Decode(opcode)
-    } catch(e) {
-      throw Error(e)
-    }
+    (<any>window).opcode = () => opcode.toString(16)
 
+    let instruction: Instruction = Decode(opcode)
+    
     Execute(instruction)
     View.draw(store.getState().UI)
-    store.dispatch(incrementPC())
-    setTimeout(run, 10)
+   
+    if (count > 0) {
+      // count--
+      setTimeout(run, 10)
+    }
   }
 
+  run();
 
-  run()
-
+  (<any>window).run = run;
+  (<any>window).store = () => store.getState()
 
 }

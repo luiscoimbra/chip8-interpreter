@@ -9,9 +9,14 @@ import toString from './infra/ROMLoader/toString'
 
 
 const ROM:Array<string> = loadRomFromMemory("INVADERS")
-// const ROM2 = loadRom("./roms/INVADERS")
-// console.log(toString(ROM2))
 const View = Web()
+
+// const ROM2 = loadRom("./roms/INVADERS")
+
+// console.log(toString(ROM2))
+// const View = ConsoleView()
+
+
 
 const dependencies: InterpreterDependencies = {
   ROM,

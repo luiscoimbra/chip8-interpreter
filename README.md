@@ -17,3 +17,9 @@ Objetivos:
 
 O que não quero: 
 - Usar classes/OOP
+
+
+TODO
+- Substituir ts-loader por babel-loader
+- add prettier
+- add eslint

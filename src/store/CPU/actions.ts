@@ -15,9 +15,10 @@ const executeCommand = (instruction:Instruction): CPUActionTypes => (
   }
 )
  
-const incrementPC = (): CPUActionTypes => (
+const incrementPC = (value: number): CPUActionTypes => (
   {
-    type: 'INCREMENT_PC'
+    type: 'INCREMENT_PC',
+    value
   }
 )
 

@@ -33,7 +33,7 @@ const CALL:Instruction = {
 }
 
 // Skip next instruction if Vx = kk.
-const SE_VX_BYTE = {
+const SE_VX_BYTE: Instruction = {
   name: 'SE_VX_BYTE',
   mask: 0xf000,
   pattern: 0x3000,
@@ -41,7 +41,7 @@ const SE_VX_BYTE = {
 }
 
 // Skip next instruction if Vx != kk.
-const SNE = {
+const SNE: Instruction = {
   name: 'SNE',
   mask: 0xf000,
   pattern: 0x4000,
@@ -141,7 +141,7 @@ const SHL:Instruction = {
   name: 'SHL',
   mask: 0xf00f,
   pattern: 0x800e,
-  opcode: 0
+  opcode: 0 
 }
 
 // Skip next instruction if Vx != Vy.
