@@ -34,15 +34,18 @@ export interface CPU {
   UI: Array<Array<number>>
 
   // Maps key current state
-  KEY: Array<number>
+  KEY: number
 
-  halted: false
+  halted: boolean
 }
 
 export const LOAD_ROM = 'LOAD_ROM'
 export const COMMAND = 'COMMAND'
 export const INCREMENT_PC = 'INCREMENT_PC'
 export const LOAD_FONTSET = 'LOAD_FONTSET'
+export const DECREMENT_DT = 'DECREMENT_DT'
+export const PRESS_KEY = 'PRESS_KEY'
+export const RESET_KEY = 'RESET_KEY'
 
 interface LoadRomAction {
   type: typeof LOAD_ROM,
@@ -64,8 +67,24 @@ interface LoadFontset {
   fontset: Uint8Array
 }
 
+interface DecrementDTAction {
+  type: typeof DECREMENT_DT
+}
+
+interface PressKeyAction {
+  type: typeof PRESS_KEY,
+  key: number
+}
+
+interface ResetKeyAction {
+  type: typeof RESET_KEY
+}
+
 export type CPUActionTypes =
  | LoadRomAction 
  | CommandAction
  | IncrementPCAction
  | LoadFontset
+ | DecrementDTAction
+ | PressKeyAction
+ | ResetKeyAction

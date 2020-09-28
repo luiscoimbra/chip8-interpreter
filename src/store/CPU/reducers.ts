@@ -1,4 +1,4 @@
-import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC, LOAD_FONTSET } from "./types";
+import { CPU, CPUActionTypes, LOAD_ROM, COMMAND, INCREMENT_PC, LOAD_FONTSET, DECREMENT_DT, PRESS_KEY, RESET_KEY } from "./types";
 import { MEMORY_OFFSET } from "../../app/constants/Processor";
 import hexToDec from "../../app/util/hexToDec";
 import getVars from "../../app/CPU/getVars";
@@ -18,7 +18,7 @@ export const initialState = ():CPU => ({
   SP: 0,
   stack: new Uint16Array(16),
   UI: cleanUI(),
-  KEY: Array(0xf).fill(0),
+  KEY: -1,
   halted: false
 })
 
@@ -33,6 +33,24 @@ export function CPUReducer(
       return {
         ...state,
         PC: PC + action.value
+      }
+
+    case DECREMENT_DT:
+      return {
+        ...state,
+        DT: state.DT - 1
+      }
+
+    case PRESS_KEY: 
+      return {
+        ...state,
+        KEY: action.key
+      }
+    
+    case RESET_KEY:
+      return {
+        ...state,
+        KEY: -1
       }
 
     case LOAD_ROM:
@@ -335,7 +353,7 @@ export function CPUReducer(
           return {
             ...state,
             // check if key Vx is pressed (1)
-            PC: (state.KEY[key]) ? state.PC + 4 : state.PC + 2
+            PC: (state.KEY === key) ? state.PC + 4 : state.PC + 2
           }
         }
 
@@ -345,7 +363,7 @@ export function CPUReducer(
           return {
             ...state,
             // check if key Vx is up (0)
-            PC: (!state.KEY[key]) ? state.PC + 4 : state.PC + 2
+            PC: (state.KEY !== key) ? state.PC + 4 : state.PC + 2
           }
         }
 
@@ -361,10 +379,23 @@ export function CPUReducer(
           }
         }
 
-        //////// LD_VX_K ///////
+        //////// LD_VX_K - wait for keypress ///////
         case 'LD_VX_K': {
+
+          if (state.KEY < 0) {
+            return {
+              ...state
+            }
+          }
+
+          const V = new Uint8Array(state.V)
+          const { x } = getVars(action.command)
+
+          V[x] = state.KEY
+
           return {
             ...state,
+            V,
             PC: state.PC + 2
           }
         }
