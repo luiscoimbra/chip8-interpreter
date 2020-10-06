@@ -2,8 +2,7 @@
 import { Drawable } from "../../view";
 
 export type InterpreterDependencies = {
-  ROM: Array<string>,
-  View: Drawable
+  ROM: Array<string>
 }
 
 // export interface Interpreter {

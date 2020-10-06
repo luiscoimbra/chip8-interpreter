@@ -1,10 +1,12 @@
 import { DISPLAY_WIDTH, DISPLAY_HEIGHT } from "../../store/constants"
+import { KEY_MAP } from "../../app/constants/Processor"
+import { pressKey, resetKey } from "../../store/CPU/actions"
 
 const COLOR = '#FF0000'
 const NO_COLOR = '#010333'
 const ZOOM = 10
 
-export const Web = () => { 
+export const Web = (store:any) => { 
   
   const canvas:HTMLCanvasElement = document.createElement('canvas')
   canvas.id = "chip8"
@@ -12,6 +14,18 @@ export const Web = () => {
   canvas.height = DISPLAY_HEIGHT * ZOOM
   const context: CanvasRenderingContext2D = canvas.getContext('2d')
   
+  document.body.addEventListener('keydown', event => {
+
+    const key = KEY_MAP.indexOf(event.key)
+    console.log(key)
+    
+    if (key > -1) {
+      store.dispatch(pressKey(key))
+    }
+
+    setTimeout(() => store.dispatch(resetKey()), 100)
+
+  })
 
   document.body.append(canvas)
 

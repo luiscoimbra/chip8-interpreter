@@ -8,8 +8,7 @@ import { ConsoleView } from './view/ConsoleView'
 import toString from './infra/ROMLoader/toString'
 
 
-const ROM:Array<string> = loadRomFromMemory("INVADERS")
-const View = Web()
+const ROM:Array<string> = loadRomFromMemory("KALEIDOSCOPE")
 
 // const ROM2 = loadRom("./roms/INVADERS")
 
@@ -19,8 +18,7 @@ const View = Web()
 
 
 const dependencies: InterpreterDependencies = {
-  ROM,
-  View
+  ROM
 }
 
 startInterpreter(dependencies)

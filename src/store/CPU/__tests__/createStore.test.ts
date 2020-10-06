@@ -13,7 +13,7 @@ test('init the state with all the default keys and values', () => {
     SP: 0,
     stack: new Uint16Array(16),
     UI: cleanUI(),
-    KEY: Array(0xf).fill(0),
+    KEY: -1,
     halted: false
   }
 

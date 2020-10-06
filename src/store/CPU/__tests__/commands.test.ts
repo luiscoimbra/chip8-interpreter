@@ -588,7 +588,7 @@ test('Ex9E - SKP Vx - [KEY is DOWN] Skip next instruction if key with the value 
   const testState = initialState()
   // testState.PC = 0x401
   testState.V[0xa] = 4
-  testState.KEY[0x4] = 1
+  testState.KEY = 0x4
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SKP_VX))
   
@@ -603,7 +603,7 @@ test('ExA1 - SKNP Vx - [KEY is DOWN] Skip next instruction if key with the value
 
   const testState = initialState()
   testState.V[0xb] = 4
-  testState.KEY[0x4] = 1
+  testState.KEY = 0x4
   const store = createStore(CPUReducer, testState)
   store.dispatch(executeCommand(SKNP_VX))
   

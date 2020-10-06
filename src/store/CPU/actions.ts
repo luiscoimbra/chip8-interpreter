@@ -22,6 +22,12 @@ const incrementPC = (value: number): CPUActionTypes => (
   }
 )
 
+const decrementDT = (): CPUActionTypes => (
+  {
+    type: 'DECREMENT_DT'
+  }
+)
+
 const loadFontset = (fontset: Uint8Array): CPUActionTypes => (
   {
     type: 'LOAD_FONTSET',
@@ -29,9 +35,25 @@ const loadFontset = (fontset: Uint8Array): CPUActionTypes => (
   }
 )
 
+const pressKey = (key: number): CPUActionTypes => (
+  {
+    type: 'PRESS_KEY',
+    key
+  }
+)
+
+const resetKey = (): CPUActionTypes => (
+  {
+    type: 'RESET_KEY'
+  }
+)
+
 export {
   loadRom,
   executeCommand,
   incrementPC,
-  loadFontset
+  loadFontset,
+  decrementDT,
+  pressKey,
+  resetKey
 }
