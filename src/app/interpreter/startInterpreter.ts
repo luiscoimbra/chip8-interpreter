@@ -40,7 +40,7 @@ export default ({
    
     if (count > 0) {
       // count--
-      setTimeout(run, 3)
+      setTimeout(run, 600)
     }
   }
 

@@ -8,7 +8,7 @@ import { ConsoleView } from './view/ConsoleView'
 import toString from './infra/ROMLoader/toString'
 
 
-const ROM:Array<string> = loadRomFromMemory("KALEIDOSCOPE")
+const ROM:Array<string> = loadRomFromMemory("MAZE")
 
 // const ROM2 = loadRom("./roms/INVADERS")
 

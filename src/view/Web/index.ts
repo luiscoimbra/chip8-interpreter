@@ -52,8 +52,7 @@ export const Web = (store:any) => {
           }
       }
 
-      
-
+    
     }
   }
 }
